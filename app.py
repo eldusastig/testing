@@ -1,36 +1,35 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-from keras import models
+from keras.models import load_model
+from keras.preprocessing import image
+import os
 
 # Function to load and prepare the image
 def load_image(image_file):
     img = Image.open(image_file)
-    img = img.resize((32, 32))
+    img = img.resize((128, 128))
     img = np.array(img)
-    if img.shape[-1] == 4:
-        img = img[..., :3]
-    img = img.reshape(1, 32, 32, 3)
+    img = img.reshape(1, 128, 128, 3)
     img = img.astype('float32')
     img /= 255.0
     return img
 
 # Function to make predictions
-def predict(image, model, labels):
-    img = load_image(image)
-    result = model.predict(img)
-    predicted_class = np.argmax(result, axis=1)
-    return labels[predicted_class[0]]
+def predict_image(img_path, model):
+    img = image.load_img(img_path, target_size=(128, 128))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = img_array / 255.0
+    predictions = model.predict(img_array)
+    predicted_class = class_labels[np.argmax(predictions)]
+    return predicted_class, np.max(predictions)
 
 # Load the model
-model = models.load_model('model3.h5')
+model = load_model('model3.h5')
 
-# Function to load labels from a text file
-def load_labels(filename):
-    with open(filename, 'r') as file:
-        labels = file.readlines()
-    labels = [label.strip() for label in labels]
-    return labels
+# Define the class labels
+class_labels = ['Angular Leaf Spot', 'Bean Rust', 'Healthy']
 
 # Streamlit UI
 def main():
@@ -65,9 +64,9 @@ def main():
             st.image(test_image, width=300, caption='Uploaded Image')
             if st.button("Predict"):
                 st.write("Predicting...")
-                labels = load_labels("labels.txt")
-                predicted_health = predict(test_image, model, labels)
-                st.success(f"Predicted Condition Category: {predicted_health}")
+                predicted_health, confidence = predict_image(test_image, model)
+                st.write(f"Predicted Condition Category: {predicted_health}")
+                st.write(f"Confidence: {confidence:.2f}")
 
     elif page == "About the Project":
         # About the project
