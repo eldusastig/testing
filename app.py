@@ -1,101 +1,58 @@
 import streamlit as st
+import tensorflow as tf
+
+@st.cache_resource
+def load_model():
+  model=tf.keras.models.load_model('model3.h5')
+  return model
+model=load_model()
+st.write("""
+# Rose Leaf Disease Classification"""
+)
+file=st.file_uploader("Choose a rose leaf photo from computer",type=["jpg","png"])
+
+import cv2
+from PIL import Image,ImageOps
 import numpy as np
-from PIL import Image
-from keras.models import load_model
-from keras.preprocessing import image
-import os
 
-# Function to load and prepare the image
-def load_image(image_file):
-    try:
-        img = Image.open(image_file)
-        img = img.resize((32, 32))
-        img = np.array(img)
-        img = img.reshape(1,32, 32, 3)
-        img = img.astype('float32')
-        img /= 255.0
-        return img
-    except Exception as e:
-        st.error(f"Error loading image: {e}")
-        return None
+# def import_and_predict(image_data,model):
+#     size=(128,128)
+#     image=ImageOps.fit(image_data,size,Image.ANTIALIAS)
+#     img=np.asarray(image)
+#     img_reshape=img[np.newaxis,...]
+#     prediction=model.predict(img_reshape)
+#     return prediction
 
-# Function to make predictions
-def predict_image(img_path, model, class_labels):
-    try:
-        img = image.load_img(img_path, target_size=(32, 32))
-        img_array = image.img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0)
-        img_array = img_array / 255.0
-        predictions = model.predict(img_array)
-        predicted_class = class_labels[np.argmax(predictions)]
-        confidence = np.max(predictions)
-        return predicted_class, confidence
-    except Exception as e:
-        st.error(f"Error predicting image: {e}")
-        return None, None
+import cv2
+from PIL import Image, ImageOps
+import numpy as np
 
-# Streamlit UI
-def main():
-    # Sidebar
-    st.sidebar.title("TEAM 8 Model Deployment in the Cloud")
-    page = st.sidebar.radio("Go to", ["Home", "Prediction", "About the Project"])
+def import_and_predict(image_data, model):
+    size = (32, 32)
+    
+    # Resize the image to the expected input shape of the model
+    image = ImageOps.fit(image_data, size, Image.ANTIALIAS)
+    img = np.asarray(image)
+    img = cv2.resize(img, (32, 32), interpolation=cv2.INTER_NEAREST)
+    
+    # Convert the image to grayscale if necessary
+    if img.ndim == 3 and img.shape[2] == 3:
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
-    if page == "Home":
-        # Title
-        st.title("Application")
+    # Reshape the image to add a channel dimension
+    img_reshape = img.reshape((1,) + img.shape + (1,))
 
-        # Main page content
-        st.write("Welcome to the Rose Leaf Classification App! This app uses a Convolutional Neural Network (CNN) model to classify images")
-        st.write("Upload a rose image and the app will classify if it's Healthy, Rose Rust, or has Rose Slug Sawfly damage")
+    # Make predictions using the Keras model
+    prediction = model.predict(img_reshape)
+    return prediction
 
-        # List of health categories
-        health_categories = [
-            "Healthy",
-            "Rose Rust",
-            "Rose Slug Sawfly damage"
-        ]
 
-        st.write("Health Categories:", health_categories)
-
-    elif page == "Prediction":
-        # Prediction page
-        st.title("Model Prediction")
-        st.write("Upload an image to predict the condition of the leaf.")
-
-        test_image = st.file_uploader("Choose an Image:")
-        if test_image is not None:
-            st.image(test_image, width=300, caption='Uploaded Image')
-            if st.button("Predict"):
-                st.write("Predicting...")
-                # Load model
-                model_path = 'model3.h5'
-                if not os.path.exists(model_path):
-                    st.error(f"Model file not found: {model_path}")
-                else:
-                    try:
-                        model = load_model(model_path)
-                    except Exception as e:
-                        st.error(f"Error loading model: {e}")
-                        return
-
-                    # Define class labels
-                    class_labels = ['Angular Leaf Spot', 'Bean Rust', 'Healthy']
-
-                    # Predict image
-                    predicted_health, confidence = predict_image(test_image, model, class_labels)
-                    if predicted_health is not None and confidence is not None:
-                        st.write(f"Predicted Condition Category: {predicted_health}")
-                        st.write(f"Confidence: {confidence:.2f}")
-
-    elif page == "About the Project":
-        # About the project
-        st.title("About the Project")
-        st.write("""
-        This Streamlit app uses a Convolutional Neural Network (CNN) model to classify different condition categories.  
-        """)
-        st.write("Developed by: Team 8 (CPE32S9)")
-        st.write("- Duque, Jethro")
-        st.write("- Natiola, Henry Jay")
-
-if __name__ == "__main__":
-    main()
+if file is None:
+    st.text("Please upload an image file")
+else:
+    image=Image.open(file)
+    st.image(image,use_column_width=True)
+    prediction=import_and_predict(image,model)
+    class_names=['Mild_Demented', 'Moderate_Demented', 'Non_Demented', 'Very_Mild_Demented']
+    string="OUTPUT : "+ class_names[np.argmax(prediction)]
+    st.success(string)
