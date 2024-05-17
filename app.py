@@ -1,3 +1,4 @@
+Henry Jay Natiola
 import streamlit as st
 import numpy as np
 from PIL import Image
@@ -23,7 +24,7 @@ def predict(image, model, labels):
     return labels[predicted_class[0]]
 
 # Load the model
-model = load_model('model1.h5')  
+model = load_model('mode1l.h5')  
 
 # Function to load labels from a text file
 def load_labels(filename):
@@ -46,7 +47,7 @@ def main():
         st.write("Welcome to the Leaf spot Classification App! This app uses a Convolutional Neural Network (CNN) model to classify images")
         st.write("Upload an image and the app will predict whether it has a disease")
 
-        # List of sports categories
+        # List of health categories
         health_categories = [
             
         ]
