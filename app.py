@@ -1,15 +1,15 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-from keras import models 
+from keras import models
 
 # Function to load and prepare the image
 def load_image(image_file):
     img = Image.open(image_file)
     img = img.resize((32, 32))
     img = np.array(img)
-    if img.shape[-1] == 4:  
-        img = img[..., :3]  
+    if img.shape[-1] == 4:
+        img = img[..., :3]
     img = img.reshape(1, 32, 32, 3)
     img = img.astype('float32')
     img /= 255.0
@@ -23,7 +23,7 @@ def predict(image, model, labels):
     return labels[predicted_class[0]]
 
 # Load the model
-model = models.load_model('model3.h5')  
+model = models.load_model('model3.h5')
 
 # Function to load labels from a text file
 def load_labels(filename):
@@ -48,10 +48,12 @@ def main():
 
         # List of health categories
         health_categories = [
-            
+            "Category 1",
+            "Category 2",
+            "Category 3"
         ]
 
-        st.write(health_categories)
+        st.write("Health Categories:", health_categories)
 
     elif page == "Prediction":
         # Prediction page
@@ -77,5 +79,5 @@ def main():
         st.write("- Duque, Jethro")
         st.write("- Natiola, Henry Jay")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
