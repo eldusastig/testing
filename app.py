@@ -1,48 +1,41 @@
 import streamlit as st
+import tensorflow as tf
+@st.cache_resource(allow_output_mutation=True)
+def load_model():
+  model=tf.keras.models.load_model('model1.h5')
+  return model
+model=load_model()
+st.write("""
+# Bean Leaf Lesion Identifier(Healthy , Angular Leaf Spot, Bean Ruse)"""
+)
+file=st.file_uploader("Choose an bean leaf photo",type=["jpg","png"])
+
+import cv2
+from PIL import Image, ImageOps
 import numpy as np
-from keras.models import load_model
-from keras.preprocessing import image
-import os
 
-# Define the model file path
-model_path = 'model1.h5'
+def import_and_predict(image_data, model):
+    size = (128, 128)
 
-# Check if the model file exists
-if not os.path.exists(model_path):
-    st.error(f"Model file not found: {model_path}")
+    image = ImageOps.fit(image_data, size)
+    img = np.asarray(image)
+    img = cv2.resize(img, (128, 128), interpolation=cv2.INTER_NEAREST)
+
+    if img.ndim == 2:
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+    img_reshape = img.reshape((1,) + img.shape + (1,))
+
+    prediction = model.predict(img_reshape)
+    return prediction
+
+
+if file is None:
+    st.text("Please upload an image file")
 else:
-    # Load the trained model
-    model = load_model(model_path)
-
-    # Define the class labels
-    class_labels = ['Angular Leaf Spot', 'Bean Rust', 'Healthy']
-
-    # Function to predict the class of an image
-    def predict_image(img_path, model):
-        img = image.load_img(img_path, target_size=(128, 128))
-        img_array = image.img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0)
-        img_array = img_array / 255.0
-        predictions = model.predict(img_array)
-        predicted_class = class_labels[np.argmax(predictions)]
-        return predicted_class, np.max(predictions)
-
-    # Streamlit app
-    st.title("Bean Leaf Lesion Classification (Angular, Bean Rust and Healthy)")
-    st.write("Upload an image to classify")
-
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
-
-    if uploaded_file is not None:
-        # Save the uploaded file
-        with open("uploaded_image.jpg", "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
-        st.image(uploaded_file, caption='Uploaded Image', use_column_width=True)
-        st.write("")
-        st.write("Classifying...")
-
-        # Predict the image
-        label, confidence = predict_image("uploaded_image.jpg", model)
-        st.write(f"Prediction: {label}")
-        st.write(f"Confidence: {confidence:.2f}")
+    image=Image.open(file)
+    st.image(image,use_column_width=True)
+    prediction=import_and_predict(image,model)
+    class_names=['Healthy', 'Angular Leaf Spot', 'Bean Rust']
+    string="OUTPUT : "+ class_names[np.argmax(prediction)]
+    st.success(string)
