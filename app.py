@@ -25,9 +25,9 @@ def import_and_predict(image_data, model):
     if img.ndim == 3 and img.shape[2] == 3:
         img = np.dot(img, [0.2989, 0.5870, 0.1140])  # Convert to grayscale using luminosity method
 
-    # Reshape the image to add a channel dimension
+    # Reshape the image to match the input shape expected by the model
     img_reshape = img.reshape((1,) + img.shape + (1,))
-
+    
     # Make predictions using the Keras model
     prediction = model.predict(img_reshape)
     return prediction
