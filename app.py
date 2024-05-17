@@ -23,7 +23,7 @@ def predict(image, model, labels):
     return labels[predicted_class[0]]
 
 # Load the model
-model = models.load_model('model3.hdf5')  
+model = models.load_model('model3.h5')  
 
 # Function to load labels from a text file
 def load_labels(filename):
