@@ -1,41 +1,47 @@
 import streamlit as st
-import tensorflow as tf
 import numpy as np
-from PIL import Image, ImageOps
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+import os
 
-@st.cache(allow_output_mutation=True)
-def load_model():
-    model = tf.keras.models.load_model('model1.h5')
-    return model
+# Load the trained model
+model = load_model('model1.h5')
 
-model = load_model()
+# Define the class labels
+class_labels = ['Angular Leaf Spot', 'Bean Rust', 'Healthy']
 
-st.write("""
-# Bean Leaf Lesion Identifier (Healthy, Angular Leaf Spot, Bean Rust)
-""")
+# Function to predict the class of an image
+def predict_image(img_path, model):
+    img = image.load_img(img_path, target_size=(128, 128))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = img_array / 255.0
+    predictions = model.predict(img_array, verbose=0)  # Added verbose=0 for cleaner output
+    predicted_class = class_labels[np.argmax(predictions)]
+    confidence = np.max(predictions)
+    return predicted_class, confidence
 
-file = st.file_uploader("Choose a bean leaf photo", type=["jpg", "png"])
+# Streamlit app
+st.title("Bean Leaf Lesion Classification")
+st.write("Upload an image of an Bean Leaf Lesion.")
 
-def import_and_predict(image_data, model):
-    size = (128, 128)
-    image = ImageOps.fit(image_data, size, Image.ANTIALIAS)
-    img = np.asarray(image)
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
+
+if uploaded_file is not None:
+    # Save the uploaded file
+    with open("uploaded_image.jpg", "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    st.image(uploaded_file, caption='Uploaded Image', use_column_width=True)
+    st.write("")
+    st.write("Classify As")
+
+    # Add a spinner while the model is making a prediction
+    with st.spinner('Model is working...'):
+        label, confidence = predict_image("uploaded_image.jpg", model)
     
-    if img.ndim == 2:  # if the image is grayscale, convert to 3 channels
-        img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    
-    img = img / 255.0  # Normalize the image to the range [0, 1]
-    img_reshape = img.reshape((1, 128, 128, 3))
-    
-    prediction = model.predict(img_reshape)
-    return prediction
+    st.write(f"Prediction: {label}")
+    st.write(f"Confidence: {confidence:.2f}")
 
-if file is None:
-    st.text("Please upload an image file")
-else:
-    image = Image.open(file)
-    st.image(image, use_column_width=True)
-    prediction = import_and_predict(image, model)
-    class_names = ['Healthy', 'Angular Leaf Spot', 'Bean Rust']
-    string = "OUTPUT : " + class_names[np.argmax(prediction)]
-    st.success(string)
+# To run the Streamlit app, use the following command:
+# streamlit run app.py
