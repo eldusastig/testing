@@ -1,47 +1,81 @@
 import streamlit as st
 import numpy as np
+from PIL import Image
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-import os
 
-# Load the trained model
-model = load_model('model1.h5')
+# Function to load and prepare the image
+def load_image(image_file):
+    img = Image.open(image_file)
+    img = img.resize((32, 32))
+    img = np.array(img)
+    if img.shape[-1] == 4:  
+        img = img[..., :3]  
+    img = img.reshape(1, 32, 32, 3)
+    img = img.astype('float32')
+    img /= 255.0
+    return img
 
-# Define the class labels
-class_labels = ['Angular Leaf Spot', 'Bean Rust', 'Healthy']
+# Function to make predictions
+def predict(image, model, labels):
+    img = load_image(image)
+    result = model.predict(img)
+    predicted_class = np.argmax(result, axis=1)
+    return labels[predicted_class[0]]
 
-# Function to predict the class of an image
-def predict_image(img_path, model):
-    img = image.load_img(img_path, target_size=(128, 128))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0
-    predictions = model.predict(img_array, verbose=0)  # Added verbose=0 for cleaner output
-    predicted_class = class_labels[np.argmax(predictions)]
-    confidence = np.max(predictions)
-    return predicted_class, confidence
+# Load the model
+model = load_model('mode1l.h5')  
 
-# Streamlit app
-st.title("Bean Leaf Lesion Classification")
-st.write("Upload an image of an Bean Leaf Lesion.")
+# Function to load labels from a text file
+def load_labels(filename):
+    with open(filename, 'r') as file:
+        labels = file.readlines()
+    labels = [label.strip() for label in labels]
+    return labels
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
+# Streamlit UI
+def main():
+    # Sidebar
+    st.sidebar.title("TEAM 8 Model Deployment in the Cloud")
+    page = st.sidebar.radio("Go to", ["Home", "Prediction", "About the Project"])
 
-if uploaded_file is not None:
-    # Save the uploaded file
-    with open("uploaded_image.jpg", "wb") as f:
-        f.write(uploaded_file.getbuffer())
+    if page == "Home":
+        # Title
+        st.title("Application")
 
-    st.image(uploaded_file, caption='Uploaded Image', use_column_width=True)
-    st.write("")
-    st.write("Classify As")
+        # Main page content
+        st.write("Welcome to the Leaf spot Classification App! This app uses a Convolutional Neural Network (CNN) model to classify images")
+        st.write("Upload an image and the app will predict whether it has a disease")
 
-    # Add a spinner while the model is making a prediction
-    with st.spinner('Model is working...'):
-        label, confidence = predict_image("uploaded_image.jpg", model)
-    
-    st.write(f"Prediction: {label}")
-    st.write(f"Confidence: {confidence:.2f}")
+        # List of sports categories
+        health_categories = [
+            
+        ]
 
-# To run the Streamlit app, use the following command:
-# streamlit run app.py
+        st.write(health_categories)
+
+    elif page == "Prediction":
+        # Prediction page
+        st.title("Model Prediction")
+        st.write("Upload an image to predict the condition of the leaf.")
+
+        test_image = st.file_uploader("Choose an Image:")
+        if test_image is not None:
+            st.image(test_image, width=300, caption='Uploaded Image')
+            if st.button("Predict"):
+                st.write("Predicting...")
+                labels = load_labels("labels.txt")
+                predicted_health = predict(test_image, model, labels)
+                st.success(f"Predicted Condition Category: {predicted_health}")
+
+    elif page == "About the Project":
+        # About the project
+        st.title("About the Project")
+        st.write("""
+        This Streamlit app uses a Convolutional Neural Network (CNN) model to classify different condition categories.  
+        """)
+        st.write("Developed by: Team 8 (CPE32S9)")
+        st.write("- Duque, Jethro")
+        st.write("- Natiola, Henry Jay")
+
+if _name_ == "_main_":
+    main()
