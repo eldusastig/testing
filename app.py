@@ -24,9 +24,16 @@ def import_and_predict(image_data, model):
     # Convert the image to grayscale if necessary
     if img.ndim == 3 and img.shape[2] == 3:
         img = np.dot(img, [0.2989, 0.5870, 0.1140])  # Convert to grayscale using luminosity method
-
+    
     # Reshape the image to match the input shape expected by the model
-    img_reshape = img.reshape((1,) + img.shape + (1,))
+    if img.ndim == 2:  # If grayscale, convert to RGB
+        img = np.stack((img,) * 3, axis=-1)
+    elif img.shape[2] != 3:  # If not RGB, something's wrong
+        st.error("Image must be in RGB format")
+        return
+    
+    # Reshape the image to match the input shape expected by the model
+    img_reshape = img.reshape((1,) + img.shape)
     
     # Make predictions using the Keras model
     prediction = model.predict(img_reshape)
