@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-from tensorflow.keras.models import load_model
+from keras import models 
 
 # Function to load and prepare the image
 def load_image(image_file):
@@ -23,7 +23,7 @@ def predict(image, model, labels):
     return labels[predicted_class[0]]
 
 # Load the model
-model = load_model('final_model.hdf5')  
+model = models.load_model('model3.hdf5')  
 
 # Function to load labels from a text file
 def load_labels(filename):
