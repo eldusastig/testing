@@ -11,7 +11,7 @@ def load_image(image_file):
         img = Image.open(image_file)
         img = img.resize((32, 32))
         img = np.array(img)
-        img = img.reshape(32, 32, 3)
+        img = img.reshape(1,32, 32, 3)
         img = img.astype('float32')
         img /= 255.0
         return img
