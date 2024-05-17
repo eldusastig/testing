@@ -44,13 +44,13 @@ def main():
 
         # Main page content
         st.write("Welcome to the Leaf spot Classification App! This app uses a Convolutional Neural Network (CNN) model to classify images")
-        st.write("Upload an image and the app will predict whether it has a disease")
+        st.write("Upload an rose image and the app would classify if it's Healthy, Rose Rust or have Rose Slug Sawfly damage")
 
         # List of health categories
         health_categories = [
-            "Category 1",
-            "Category 2",
-            "Category 3"
+            "Healthy",
+            "Rose Rust",
+            "Rose Slug Sawfly damage"
         ]
 
         st.write("Health Categories:", health_categories)
