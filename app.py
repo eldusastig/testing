@@ -16,14 +16,36 @@ def load_image(image_file):
     return img
 
 # Function to make predictions
-def predict_image(img_path, model):
-    img = image.load_img(img_path, target_size=(128, 128))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0
-    predictions = model.predict(img_array)
-    predicted_class = class_labels[np.argmax(predictions)]
-    return predicted_class, np.max(predictions)
+def import_and_predict(image_data, model):
+    size = (128, 128)
+    
+    # Resize the image to the expected input shape of the model
+    image = ImageOps.fit(image_data, size, Image.ANTIALIAS)
+    img = np.asarray(image)
+    img = cv2.resize(img, (128, 128), interpolation=cv2.INTER_NEAREST)
+    
+    # Convert the image to grayscale if necessary
+    if img.ndim == 3 and img.shape[2] == 3:
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+    # Reshape the image to add a channel dimension
+    img_reshape = img.reshape((1,) + img.shape + (1,))
+
+    # Make predictions using the Keras model
+    prediction = model.predict(img_reshape)
+    return prediction
+
+
+if file is None:
+    st.text("Please upload an image file")
+else:
+    image=Image.open(file)
+    st.image(image,use_column_width=True)
+    prediction=import_and_predict(image,model)
+    class_names=['Mild_Demented', 'Moderate_Demented', 'Non_Demented', 'Very_Mild_Demented']
+    string="OUTPUT : "+ class_names[np.argmax(prediction)]
+    st.success(string)
+
 
 # Load the model
 model = load_model('model3.h5')
