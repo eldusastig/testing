@@ -22,7 +22,7 @@ def load_image(image_file):
 # Function to make predictions
 def predict_image(img_path, model, class_labels):
     try:
-        img = image.load_img(img_path, target_size=(128, 128))
+        img = image.load_img(img_path, target_size=(32, 32))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = img_array / 255.0
