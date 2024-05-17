@@ -9,9 +9,9 @@ import os
 def load_image(image_file):
     try:
         img = Image.open(image_file)
-        img = img.resize((128, 128))
+        img = img.resize((32, 32))
         img = np.array(img)
-        img = img.reshape(1, 128, 128, 3)
+        img = img.reshape(32, 32, 3)
         img = img.astype('float32')
         img /= 255.0
         return img
