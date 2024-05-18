@@ -34,11 +34,11 @@ def load_labels(filename):
 
 # Streamlit UI
 def main():
-    st.sidebar.title("TEAM 8 Model Deployment in the Cloud")
+    st.sidebar.title("TEAM 6 Model Deployment in the Cloud")
     st.title("Rice Classifier")
 
-        # Main page content
-    st.write("Welcome to the Rice Classifcication App")
+    # Main page content
+    st.write("Welcome to the Rice Classification App")
     test_image = st.file_uploader("Choose an Image:")
     if test_image is not None:
         st.image(test_image, width=300, caption='Uploaded Image')
@@ -48,7 +48,5 @@ def main():
             predicted_health = predict(test_image, model, labels)
             st.success(f"Predicted Rice Category: {predicted_health}")
 
-    
-  
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
