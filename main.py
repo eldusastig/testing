@@ -36,22 +36,21 @@ def load_labels(filename):
 def main():
     # Sidebar
     st.sidebar.title("TEAM 8 Model Deployment in the Cloud")
-    page = st.sidebar.radio("Go to", ["Home", "Prediction", "About the Project"])
+    page = st.sidebar.radio("Go to", ["Model Description", "Prediction", "About the Project"])
 
     if page == "Home":
         # Title
-        st.title("Application")
+        st.title("Malaria Cell Classifier")
 
         # Main page content
-        st.write("Welcome to the Leaf spot Classification App! This app uses a Convolutional Neural Network (CNN) model to classify images")
-        st.write("Upload an image and the app will predict whether it has a disease")
+        st.write("Welcome to the Malaria detection app! This app uses a Convolutional Neural Network (CNN) model to classify images of a cell")
+        st.write("Upload an image and the app will predict whether an cell is infected or not")
 
-        # List of health categories
     
     elif page == "Prediction":
         # Prediction page
         st.title("Model Prediction")
-        st.write("Upload an image to predict the condition of the leaf.")
+        st.write("Upload an image to of an cell.")
 
         test_image = st.file_uploader("Choose an Image:")
         if test_image is not None:
