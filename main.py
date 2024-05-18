@@ -6,11 +6,11 @@ from tensorflow.keras.models import load_model
 # Function to load and prepare the image
 def load_image(image_file):
     img = Image.open(image_file)
-    img = img.resize((128, 128))
+    img = img.resize((50, 50))
     img = np.array(img)
     if img.shape[-1] == 4:  
         img = img[..., :3]  
-    img = img.reshape(1, 128, 128, 3)
+    img = img.reshape(1, 50, 50, 3)
     img = img.astype('float32')
     img /= 255.0
     return img
