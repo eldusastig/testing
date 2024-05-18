@@ -6,11 +6,11 @@ from tensorflow.keras.models import load_model
 # Function to load and prepare the image
 def load_image(image_file):
     img = Image.open(image_file)
-    img = img.resize((32, 32))
+    img = img.resize((128, 128))
     img = np.array(img)
     if img.shape[-1] == 4:  
         img = img[..., :3]  
-    img = img.reshape(1, 32, 32, 3)
+    img = img.reshape(1, 128, 128, 3)
     img = img.astype('float32')
     img /= 255.0
     return img
@@ -47,12 +47,7 @@ def main():
         st.write("Upload an image and the app will predict whether it has a disease")
 
         # List of health categories
-        health_categories = [
-            "Healthy_Leaf_Rose", "Rose_Rust", "Rose_sawfly_slug"
-        ]
-
-        st.write(health_categories)
-
+    
     elif page == "Prediction":
         # Prediction page
         st.title("Model Prediction")
