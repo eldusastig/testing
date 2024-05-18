@@ -46,13 +46,13 @@ def main():
         st.write("Welcome to the Malaria Detection app! This app uses a Convolutional Neural Network (CNN) model to classify if a cell is infected with Malaria or not")
         st.write("Upload an image and the app will predict whether an cell is infected or not")
         test_image = st.file_uploader("Choose an Image:")
-            if test_image is not None:
-                st.image(test_image, width=300, caption='Uploaded Image')
-                    if st.button("Predict"):
-                        st.write("Predicting...")
-                        labels = load_labels("labels.txt")
-                        predicted_health = predict(test_image, model, labels)
-                        st.success(f"Predicted Condition Category: {predicted_health}")
+        if test_image is not None:
+            st.image(test_image, width=300, caption='Uploaded Image')
+                if st.button("Predict"):
+                    st.write("Predicting...")
+                    labels = load_labels("labels.txt")
+                    predicted_health = predict(test_image, model, labels)
+                    st.success(f"Predicted Condition Category: {predicted_health}")
 
     
     elif page == "About the Project":
