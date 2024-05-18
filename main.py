@@ -43,7 +43,7 @@ def main():
         st.title("Malaria Cell Classifier")
 
         # Main page content
-        st.write("Welcome to the Malaria Detection app! This app uses a Convolutional Neural Network (CNN) model to classify images of a cell")
+        st.write("Welcome to the Malaria Detection app! This app uses a Convolutional Neural Network (CNN) model to classify if a cell is infected with Malaria or not")
         st.write("Upload an image and the app will predict whether an cell is infected or not")
 
     
