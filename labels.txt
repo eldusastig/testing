@@ -1,3 +1,2 @@
-Angular_Leaf_Spot
-Bean_Rust
+Infected
 Healthy
