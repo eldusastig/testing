@@ -1,72 +1,37 @@
-import streamlit as st
+import cv2
 import numpy as np
-from PIL import Image
-from tensorflow.keras.models import load_model
+import streamlit as st
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2,preprocess_input as mobilenet_v2_preprocess_input
 
-# Function to load and prepare the image
-def load_image(image_file):
-    img = Image.open(image_file)
-    img = img.resize((50, 50))
-    img = np.array(img)
-    if img.shape[-1] == 4:  
-        img = img[..., :3]  
-    img = img.reshape(1, 50, 50, 3)
-    img = img.astype('float32')
-    img /= 255.0
-    return img
+model = tf.keras.models.load_model("mdl_wt.hdf5")
 
-# Function to make predictions
-def predict(image, model, labels):
-    img = load_image(image)
-    result = model.predict(img)
-    predicted_class = np.argmax(result, axis=1)
-    return labels[predicted_class[0]]
+uploaded_file = st.file_uploader("Choose a image file", type="jpg")
 
-# Load the model
-model = load_model('model8.hdf5')  
+map_dict = {0: 'dog',
+            1: 'horse',
+            2: 'elephant',
+            3: 'butterfly',
+            4: 'chicken',
+            5: 'cat',
+            6: 'cow',
+            7: 'sheep',
+            8: 'spider',
+            9: 'squirrel'}
 
-# Function to load labels from a text file
-def load_labels(filename):
-    with open(filename, 'r') as file:
-        labels = file.readlines()
-    labels = [label.strip() for label in labels]
-    return labels
+if uploaded_file is not None:
+    file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
+    opencv_image = cv2.imdecode(file_bytes, 1)
+    opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
+    resized = cv2.resize(opencv_image,(224,224))
 
-# Streamlit UI
-def main():
-    # Sidebar
-    st.sidebar.title("TEAM 8 Model Deployment in the Cloud")
-    page = st.sidebar.radio("Go to", ["Model", "About the Project"])
+    st.image(opencv_image, channels="RGB")
 
-    if page == "Model":
-        # Title
-        st.title("Malaria Cell Classifier")
+    resized = mobilenet_v2_preprocess_input(resized)
+    img_reshape = resized[np.newaxis,...]
 
-        # Main page content
-        st.write("Welcome to the Malaria Detection app! This app uses a Convolutional Neural Network (CNN) model to classify if a cell is infected with Malaria or not")
-        st.write("Upload an image and the app will predict whether an cell is infected or not")
-        st.write("Uploaded Image should only contain ONE cell")
-        malaria_banner = "https://raw.githubusercontent.com/eldusastig/testing/blob/main/malaria.png"  # Replace this URL with the URL of your image
-        st.image( malaria_banner , caption='Like this ', use_column_width=True)
-        test_image = st.file_uploader("Choose an Image:")
-        if test_image is not None:
-            st.image(test_image, width=300, caption='Uploaded Image')
-            if st.button("Predict"):
-                    st.write("Predicting...")
-                    labels = load_labels("labels.txt")
-                    predicted_health = predict(test_image, model, labels)
-                    st.success(f"Predicted Condition Category: {predicted_health}")
-
-    
-    elif page == "About the Project":
-        # About the project
-        st.title("About the Project")
-        st.write("""
-        This Streamlit app uses a Convolutional Neural Network (CNN) model that classifies cell for Malaria Detection.  
-        """)
-        st.write("Developed by: Team 8 (CPE32S9)")
-        st.write("- Duque, Jethro")
-        st.write("- Natiola, Henry Jay")
-
-if __name__ == "__main__":
-    main()
+    Genrate_pred = st.button("Generate Prediction")
+    if Genrate_pred:
+        prediction = model.predict(img_reshape).argmax()
+        st.title("Predicted Label for the image is {}".format(map_dict[prediction]))
