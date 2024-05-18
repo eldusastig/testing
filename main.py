@@ -36,7 +36,7 @@ def load_labels(filename):
 def main():
     # Sidebar
     st.sidebar.title("TEAM 8 Model Deployment in the Cloud")
-    page = st.sidebar.radio("Go to", ["Model Description", "Prediction", "About the Project"])
+    page = st.sidebar.radio("Go to", ["Model", "About the Project"])
 
     if page == "Home":
         # Title
@@ -45,22 +45,16 @@ def main():
         # Main page content
         st.write("Welcome to the Malaria Detection app! This app uses a Convolutional Neural Network (CNN) model to classify if a cell is infected with Malaria or not")
         st.write("Upload an image and the app will predict whether an cell is infected or not")
+        test_image = st.file_uploader("Choose an Image:")
+            if test_image is not None:
+                st.image(test_image, width=300, caption='Uploaded Image')
+                if st.button("Predict"):
+                    st.write("Predicting...")
+                    labels = load_labels("labels.txt")
+                    predicted_health = predict(test_image, model, labels)
+                    st.success(f"Predicted Condition Category: {predicted_health}")
 
     
-    elif page == "Prediction":
-        # Prediction page
-        st.title("Model Prediction")
-        st.write("Upload an image to of an cell.")
-
-        test_image = st.file_uploader("Choose an Image:")
-        if test_image is not None:
-            st.image(test_image, width=300, caption='Uploaded Image')
-            if st.button("Predict"):
-                st.write("Predicting...")
-                labels = load_labels("labels.txt")
-                predicted_health = predict(test_image, model, labels)
-                st.success(f"Predicted Condition Category: {predicted_health}")
-
     elif page == "About the Project":
         # About the project
         st.title("About the Project")
