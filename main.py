@@ -62,7 +62,7 @@ def main():
         # About the project
         st.title("About the Project")
         st.write("""
-        This Streamlit app uses a Convolutional Neural Network (CNN) model to classify different condition categories.  
+        This Streamlit app uses a Convolutional Neural Network (CNN) model that classifies cell for Malaria Detection.  
         """)
         st.write("Developed by: Team 8 (CPE32S9)")
         st.write("- Duque, Jethro")
