@@ -23,7 +23,7 @@ def predict(image, model, labels):
     return labels[predicted_class[0]]
 
 # Load the model
-model = load_model('mdl_wt (3).hdf5')  
+model = load_model('new_model.h5')  
 
 # Function to load labels from a text file
 def load_labels(filename):
@@ -34,39 +34,21 @@ def load_labels(filename):
 
 # Streamlit UI
 def main():
-    # Sidebar
     st.sidebar.title("TEAM 8 Model Deployment in the Cloud")
-    page = st.sidebar.radio("Go to", ["Model", "About the Project"])
-
-    if page == "Model":
-        # Title
-        st.title("Malaria Cell Classifier")
+    st.title("Rice Classifier")
 
         # Main page content
-        st.write("Welcome to the Malaria Detection app! This app uses a Convolutional Neural Network (CNN) model to classify if a cell is infected with Malaria or not")
-        st.write("Upload an image and the app will predict whether an cell is infected or not")
-        st.write("Uploaded Image should only contain ONE cell")
-        malaria_banner = "https://raw.githubusercontent.com/eldusastig/testing/blob/main/malaria.png"  # Replace this URL with the URL of your image
-        st.image( malaria_banner , caption='Like this ', use_column_width=True)
-        test_image = st.file_uploader("Choose an Image:")
-        if test_image is not None:
-            st.image(test_image, width=300, caption='Uploaded Image')
-            if st.button("Predict"):
-                    st.write("Predicting...")
-                    labels = load_labels("labels.txt")
-                    predicted_health = predict(test_image, model, labels)
-                    st.success(f"Predicted Condition Category: {predicted_health}")
+    st.write("Welcome to the Rice Classifcication App")
+    test_image = st.file_uploader("Choose an Image:")
+    if test_image is not None:
+        st.image(test_image, width=300, caption='Uploaded Image')
+        if st.button("Predict"):
+            st.write("Predicting...")
+            labels = load_labels("labels.txt")
+            predicted_health = predict(test_image, model, labels)
+            st.success(f"Predicted Rice Category: {predicted_health}")
 
     
-    elif page == "About the Project":
-        # About the project
-        st.title("About the Project")
-        st.write("""
-        This Streamlit app uses a Convolutional Neural Network (CNN) model that classifies cell for Malaria Detection.  
-        """)
-        st.write("Developed by: Team 8 (CPE32S9)")
-        st.write("- Duque, Jethro")
-        st.write("- Natiola, Henry Jay")
-
-if __name__ == "__main__":
+  
+if _name_ == "_main_":
     main()
