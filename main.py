@@ -38,7 +38,7 @@ def main():
     st.sidebar.title("TEAM 8 Model Deployment in the Cloud")
     page = st.sidebar.radio("Go to", ["Model", "About the Project"])
 
-    if page == "Home":
+    if page == "Model":
         # Title
         st.title("Malaria Cell Classifier")
 
